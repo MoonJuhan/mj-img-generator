@@ -10,11 +10,9 @@ const boot = async () => {
 
   Object.values(plugins).forEach(app.use)
 
-  //   const result = await import('./global-components')
-  //   result.default(app)
-
+  const result = await import('./global-components')
+  result.default(app)
   app.mount('#app')
 }
 
 boot()
-
