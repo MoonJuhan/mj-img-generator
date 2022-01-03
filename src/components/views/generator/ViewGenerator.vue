@@ -39,57 +39,73 @@
 import CategoryWrapper from './CategoryWrapper'
 import { computed, ref } from 'vue'
 
-export default {
-  components: {
-    CategoryWrapper,
-  },
-  setup() {
-    const categoryList = ref([
-      {
-        name: 'Category 1',
-        imgList: [],
-        disabled: false,
-      },
-    ])
+const manageUpload = () => {
+  const categoryList = ref([
+    {
+      name: 'Category 1',
+      imgList: [],
+      disabled: false,
+    },
+  ])
 
-    const localCategoryList = computed(() => categoryList.value.filter((el) => !el.disabled))
+  const localCategoryList = computed(() => categoryList.value.filter((el) => !el.disabled))
 
-    const addCategory = () => {
+  const addCategory = () => {
+    if (!uploadLock.value) {
       categoryList.value.push({
         name: `Category ${categoryList.value.length + 1}`,
         imgList: [],
       })
     }
+  }
 
-    const readFile = (category, file) => {
-      const reader = new FileReader()
+  const readFile = (category, file) => {
+    const reader = new FileReader()
 
-      reader.onload = (event) => {
-        const img = new Image()
+    reader.onload = (event) => {
+      const img = new Image()
 
-        img.onload = () => {
-          category.push({ img, name: file.name })
-        }
-
-        img.src = event.target.result
+      img.onload = () => {
+        category.push({ img, name: file.name })
       }
 
-      reader.readAsDataURL(file)
+      img.src = event.target.result
     }
 
-    const onChangeFile = async ({ files, imgList }) => {
-      console.log('onChangeFile')
-      for (let i = 0; i < files.target.files.length; i++) {
-        readFile(imgList, files.target.files[i])
-      }
-    }
+    reader.readAsDataURL(file)
+  }
 
-    const deleteImage = ({ index, name }) => {
-      categoryList.value.find((el) => el.name === name).imgList.splice(index, 1)
+  const onChangeFile = async ({ files, imgList }) => {
+    console.log('onChangeFile')
+    for (let i = 0; i < files.target.files.length; i++) {
+      readFile(imgList, files.target.files[i])
     }
+  }
 
-    const deleteCategory = ({ name }) => {
-      categoryList.value.find((el) => el.name === name).disabled = true
+  const deleteImage = ({ index, name }) => {
+    categoryList.value.find((el) => el.name === name).imgList.splice(index, 1)
+  }
+
+  const deleteCategory = ({ name }) => {
+    categoryList.value.find((el) => el.name === name).disabled = true
+  }
+
+  return {
+    categoryList,
+    localCategoryList,
+    addCategory,
+    onChangeFile,
+    deleteImage,
+    deleteCategory,
+  }
+}
+
+export default {
+  components: {
+    CategoryWrapper,
+  },
+  setup() {
+    const { categoryList, localCategoryList, addCategory, onChangeFile, deleteImage, deleteCategory } = manageUpload()
     }
 
     return {
