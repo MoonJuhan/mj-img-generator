@@ -35,6 +35,15 @@ export default {
   border-radius: 10px;
   transition: all 0.4s;
 
+  &.disabled {
+    background-color: rgba(44, 62, 80, 0.1);
+    cursor: default;
+
+    &:active {
+      background-color: rgba(44, 62, 80, 0.1);
+    }
+  }
+
   &:hover {
     background-color: rgba(44, 62, 80, 0.1);
   }
