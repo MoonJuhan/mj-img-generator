@@ -21,10 +21,11 @@
         @delete-image="deleteImage"
         @delete-category="deleteCategory"
         :deleteDisabled="index === 0"
+        :locked="uploadLock"
       />
 
       <li class="button-wrapper glass-wrapper">
-        <AppButton :text="'Add Category'" @on-click="addCategory" />
+        <AppButton :text="'Add Category'" @on-click="addCategory" :class="{ disabled: uploadLock }" />
         <AppButton :text="'Set Position'" @on-click="setPosition" />
       </li>
     </ul>
@@ -106,6 +107,23 @@ export default {
   },
   setup() {
     const { categoryList, localCategoryList, addCategory, onChangeFile, deleteImage, deleteCategory } = manageUpload()
+
+    const uploadLock = ref(false)
+
+    const setPosition = () => {
+      if (categoryList.value[0].imgList.length === 0) {
+        alert('Category 1 requires at least one image.')
+      } else {
+        uploadLock.value = true
+
+        categoryList.value.forEach((cat) => {
+          if (cat.imgList.length === 0) {
+            cat.disabled = true
+          }
+        })
+
+        console.log(localCategoryList.value)
+      }
     }
 
     return {
@@ -115,6 +133,8 @@ export default {
       onChangeFile,
       deleteImage,
       deleteCategory,
+      setPosition,
+      uploadLock,
     }
   },
 }

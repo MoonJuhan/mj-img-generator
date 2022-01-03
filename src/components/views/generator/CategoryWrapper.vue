@@ -3,7 +3,7 @@
     <div class="title-wrapper">
       <span v-html="item.name" />
       <AppButton
-        v-if="item.imgList.length === 0 && !deleteDisabled"
+        v-if="item.imgList.length === 0 && !deleteDisabled && !locked"
         :text="'Delete Category'"
         @on-click="deleteCategory"
       />
@@ -12,9 +12,9 @@
     <ul>
       <li v-for="(img, imgIndex) in item.imgList" :key="imgIndex">
         <img :src="img.img.src" />
-        <span class="delete-button" @click="deleteImage(imgIndex)">Delete</span>
+        <span v-if="!locked" class="delete-button" @click="deleteImage(imgIndex)">Delete</span>
       </li>
-      <li>
+      <li v-if="!locked">
         <input type="file" multiple @change="onChangeFile" />
         <span>Add Image</span>
       </li>
@@ -27,6 +27,7 @@ export default {
   props: {
     item: Object,
     deleteDisabled: Boolean,
+    locked: Boolean,
   },
   setup(props, { emit }) {
     const onChangeFile = (e) => {
