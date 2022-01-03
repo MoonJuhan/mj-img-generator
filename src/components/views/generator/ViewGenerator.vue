@@ -51,15 +51,6 @@ const manageUpload = () => {
 
   const localCategoryList = computed(() => categoryList.value.filter((el) => !el.disabled))
 
-  const addCategory = () => {
-    if (!uploadLock.value) {
-      categoryList.value.push({
-        name: `Category ${categoryList.value.length + 1}`,
-        imgList: [],
-      })
-    }
-  }
-
   const readFile = (category, file) => {
     const reader = new FileReader()
 
@@ -94,7 +85,7 @@ const manageUpload = () => {
   return {
     categoryList,
     localCategoryList,
-    addCategory,
+
     onChangeFile,
     deleteImage,
     deleteCategory,
@@ -106,7 +97,16 @@ export default {
     CategoryWrapper,
   },
   setup() {
-    const { categoryList, localCategoryList, addCategory, onChangeFile, deleteImage, deleteCategory } = manageUpload()
+    const { categoryList, localCategoryList, onChangeFile, deleteImage, deleteCategory } = manageUpload()
+
+    const addCategory = () => {
+      if (!uploadLock.value) {
+        categoryList.value.push({
+          name: `Category ${categoryList.value.length + 1}`,
+          imgList: [],
+        })
+      }
+    }
 
     const uploadLock = ref(false)
 
