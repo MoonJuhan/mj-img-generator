@@ -10,6 +10,7 @@
       <div class="section-wrapper" :class="`progress-${progress}`">
         <UploadSection class="section" ref="refUploadSection" :locked="progress !== 1" />
         <SetPositionSection class="section" ref="refSetPositionSection" :categoryList="refinedCategoryList" />
+        <GenerateSection class="section" ref="refGenerateSection" :categoryList="refinedCategoryList" />
       </div>
     </div>
   </div>
@@ -18,17 +19,20 @@
 <script>
 import UploadSection from './UploadSection'
 import SetPositionSection from './SetPositionSection'
+import GenerateSection from './GenerateSection'
 import { nextTick, ref } from 'vue'
 
 export default {
   components: {
     UploadSection,
     SetPositionSection,
+    GenerateSection,
   },
   setup() {
     const progress = ref(1)
     const refUploadSection = ref(null)
     const refSetPositionSection = ref(null)
+    const refGenerateSection = ref(null)
 
     const addCategory = () => {
       if (progress.value === 1) {
@@ -48,16 +52,20 @@ export default {
     }
 
     const generateImages = () => {
-      console.log('GENERATE!!')
+      progress.value = 3
+
+      nextTick(refGenerateSection.value.generateImage)
     }
 
     return {
       refUploadSection,
       refSetPositionSection,
+      refGenerateSection,
       addCategory,
       setPosition,
       generateImages,
       progress,
+      refinedCategoryList,
     }
   },
 }
