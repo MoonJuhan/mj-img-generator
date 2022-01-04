@@ -1,5 +1,5 @@
 <template>
-  <li class="category-wrapper glass-wrapper">
+  <li class="category-wrapper">
     <div class="title-wrapper">
       <span v-html="item.name" />
       <AppButton

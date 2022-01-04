@@ -1,163 +1,110 @@
 <template>
   <div class="view-generator">
-    <!-- <iframe
-      width="640px"
-      height="480px"
-      src="https://www.artstation.com/embed/44520477"
-      frameborder="0"
-      allowfullscreen
-      mozallowfullscreen="true"
-      webkitallowfullscreen="true"
-      onmousewheel=""
-      scrolling="no"
-    ></iframe> -->
+    <div class="button-wrapper glass-wrapper">
+      <AppButton :text="'Add Category'" @on-click="addCategory" :disabled="progress !== 1" />
+      <AppButton :text="'Set Position'" @on-click="setPosition" :disabled="progress !== 1" />
+      <AppButton :text="'Generate Images'" @on-click="generateImages" :disabled="progress !== 2" />
+    </div>
 
-    <ul>
-      <CategoryWrapper
-        v-for="(item, index) in localCategoryList"
-        :key="index"
-        :item="item"
-        @on-change-file="onChangeFile"
-        @delete-image="deleteImage"
-        @delete-category="deleteCategory"
-        :deleteDisabled="index === 0"
-        :locked="uploadLock"
-      />
-
-      <li class="button-wrapper glass-wrapper">
-        <AppButton :text="'Add Category'" @on-click="addCategory" :class="{ disabled: uploadLock }" />
-        <AppButton :text="'Set Position'" @on-click="setPosition" />
-      </li>
-    </ul>
-
-    <!-- <canvas ref="refCanvas" />
-    <canvas ref="refNewCanvas" />
-    <input type="file" multiple @change="onChangeFile" /> -->
+    <div class="wrap-div">
+      <div class="section-wrapper" :class="`progress-${progress}`">
+        <UploadSection class="section" ref="refUploadSection" :locked="progress !== 1" />
+        <SetPositionSection class="section" ref="refSetPositionSection" :locked="progress !== 2" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import CategoryWrapper from './CategoryWrapper'
-import { computed, ref } from 'vue'
-
-const manageUpload = () => {
-  const categoryList = ref([
-    {
-      name: 'Category 1',
-      imgList: [],
-      disabled: false,
-    },
-  ])
-
-  const localCategoryList = computed(() => categoryList.value.filter((el) => !el.disabled))
-
-  const readFile = (category, file) => {
-    const reader = new FileReader()
-
-    reader.onload = (event) => {
-      const img = new Image()
-
-      img.onload = () => {
-        category.push({ img, name: file.name })
-      }
-
-      img.src = event.target.result
-    }
-
-    reader.readAsDataURL(file)
-  }
-
-  const onChangeFile = async ({ files, imgList }) => {
-    console.log('onChangeFile')
-    for (let i = 0; i < files.target.files.length; i++) {
-      readFile(imgList, files.target.files[i])
-    }
-  }
-
-  const deleteImage = ({ index, name }) => {
-    categoryList.value.find((el) => el.name === name).imgList.splice(index, 1)
-  }
-
-  const deleteCategory = ({ name }) => {
-    categoryList.value.find((el) => el.name === name).disabled = true
-  }
-
-  return {
-    categoryList,
-    localCategoryList,
-
-    onChangeFile,
-    deleteImage,
-    deleteCategory,
-  }
-}
+import UploadSection from './UploadSection'
+import SetPositionSection from './SetPositionSection'
+import { ref } from 'vue'
 
 export default {
   components: {
-    CategoryWrapper,
+    UploadSection,
+    SetPositionSection,
   },
   setup() {
-    const { categoryList, localCategoryList, onChangeFile, deleteImage, deleteCategory } = manageUpload()
+    const progress = ref(1)
+    const refUploadSection = ref(null)
+    const refSetPositionSection = ref(null)
 
     const addCategory = () => {
-      if (!uploadLock.value) {
-        categoryList.value.push({
-          name: `Category ${categoryList.value.length + 1}`,
-          imgList: [],
-        })
+      if (progress.value === 1) {
+        refUploadSection.value.addCategory()
       }
     }
 
-    const uploadLock = ref(false)
+    const refinedCategoryList = ref([])
 
     const setPosition = () => {
-      if (categoryList.value[0].imgList.length === 0) {
-        alert('Category 1 requires at least one image.')
-      } else {
-        uploadLock.value = true
-
-        categoryList.value.forEach((cat) => {
-          if (cat.imgList.length === 0) {
-            cat.disabled = true
-          }
-        })
-
-        console.log(localCategoryList.value)
+      if (refUploadSection.value.refineItems()) {
+        progress.value = 2
+        refinedCategoryList.value = refUploadSection.value.localCategoryList
       }
+    }
+
+    const generateImages = () => {
+      console.log('GENERATE!!')
     }
 
     return {
-      categoryList,
-      localCategoryList,
+      refUploadSection,
+      refSetPositionSection,
       addCategory,
-      onChangeFile,
-      deleteImage,
-      deleteCategory,
       setPosition,
-      uploadLock,
+      generateImages,
+      progress,
     }
   },
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .view-generator {
-  display: flex;
-
-  li {
-    margin: 0 0 40px;
-
-    :nth-last-child(1) {
-      margin: 0;
-    }
+  .button-wrapper {
+    display: flex;
+    margin: 0 0 30px;
 
     .app-button {
-      padding: 8px 30px;
       margin: 0 10px 0 0;
     }
+  }
 
-    &.button-wrapper {
-      display: flex;
+  .wrap-div {
+    position: relative;
+    width: 100vw;
+    height: calc(100vh);
+    margin: 0 -8px;
+
+    .section-wrapper {
+      width: 300%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+
+      transition: all 0.4s;
+
+      &.progress-2 {
+        left: -100%;
+      }
+
+      &.progress-3 {
+        left: -200%;
+      }
+
+      .section {
+        margin: 0 8px;
+
+        .section-title {
+          font-size: 20px;
+          font-weight: bold;
+          margin: 0 0 10px;
+        }
+      }
     }
   }
 }
