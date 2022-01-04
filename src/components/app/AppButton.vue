@@ -1,5 +1,5 @@
 <template>
-  <a class="app-button" @click="onClick" v-html="text" />
+  <a class="app-button" :class="{ disabled }" @click="onClick" v-html="text" />
 </template>
 
 <script>
@@ -8,11 +8,14 @@ export default {
   props: {
     text: String,
     link: String,
+    disabled: Boolean,
   },
   setup(props, { emit }) {
     const router = useRouter()
 
     const onClick = () => {
+      if (props.disabled) return
+
       if (props.link) {
         router.push(props.link)
       } else {
