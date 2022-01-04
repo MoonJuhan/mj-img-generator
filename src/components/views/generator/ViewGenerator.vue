@@ -9,7 +9,7 @@
     <div class="wrap-div">
       <div class="section-wrapper" :class="`progress-${progress}`">
         <UploadSection class="section" ref="refUploadSection" :locked="progress !== 1" />
-        <SetPositionSection class="section" ref="refSetPositionSection" :locked="progress !== 2" />
+        <SetPositionSection class="section" ref="refSetPositionSection" :categoryList="refinedCategoryList" />
       </div>
     </div>
   </div>
@@ -18,7 +18,7 @@
 <script>
 import UploadSection from './UploadSection'
 import SetPositionSection from './SetPositionSection'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 
 export default {
   components: {
@@ -42,6 +42,8 @@ export default {
       if (refUploadSection.value.refineItems()) {
         progress.value = 2
         refinedCategoryList.value = refUploadSection.value.localCategoryList
+
+        nextTick(refSetPositionSection.value.initCanvas)
       }
     }
 
