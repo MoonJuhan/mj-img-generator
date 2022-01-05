@@ -24,6 +24,7 @@
 
 <script>
 import CategoryWrapper from './CategoryWrapper'
+import promiseDrawImage from '@/hooks/promise-draw-image.js'
 import { ref } from 'vue'
 
 export default {
@@ -36,24 +37,19 @@ export default {
   setup(props) {
     const refCanvas = ref(null)
 
-    const initCanvas = () => {
+    const { drawImage } = promiseDrawImage()
+
+    const initCanvas = async () => {
       const baseImg = props.categoryList[0].imgList[0]
 
       refCanvas.value.width = baseImg.img.width
       refCanvas.value.height = baseImg.img.height
 
-      const lazyDrawImage = async (index) => {
-        const { img } = props.categoryList[index].imgList[0]
-        refCanvas.value.getContext('2d').drawImage(img, 0, 0)
+      for (const cat of props.categoryList) {
+        const { img } = cat.imgList[0]
 
-        setTimeout(() => {
-          if (props.categoryList[index + 1]) {
-            lazyDrawImage(index + 1)
-          }
-        }, 1000)
+        await drawImage(refCanvas.value, img)
       }
-
-      lazyDrawImage(0)
     }
 
     return {
