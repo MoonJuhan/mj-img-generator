@@ -2,6 +2,23 @@
   <div class="generate-section glass-wrapper">
     <h1 class="section-title">Generate</h1>
 
+    <div class="form-wrapper">
+      <div class="input-wrapper">
+        <span class="title">File Name</span>
+        <input type="text" v-model="fileName" />
+      </div>
+
+      <div class="input-wrapper">
+        <span class="title">File Start Index</span>
+        <input type="number" v-model="fileStartIndex" min="0" />
+      </div>
+    </div>
+
+    <div class="form-wrapper">
+      <span>File Name Example: {{ fileName }}_{{ fileStartIndex }}.png</span>
+      <AppButton :text="'Generate and Download'" @on-click="generateImages" />
+    </div>
+
     <div class="generate-canvas">
       <span class="title">Generate Canvas</span>
       <canvas ref="refCanvas" />
@@ -10,17 +27,46 @@
 </template>
 
 <script>
+import promiseDrawImage from '@/hooks/promise-draw-image.js'
 import { ref } from 'vue'
 
-export default {
-  props: {
-    categoryList: Array,
-  },
-  setup(props) {
-    const refCanvas = ref(null)
+const setFilesName = () => {
+  const fileName = ref(null)
+  const fileStartIndex = ref(null)
 
-    const downloadImage = (name) => {
-      let dataURL = refCanvas.value.toDataURL('image/png')
+  const validateInput = () => {
+    if (!fileName.value) return false
+
+    if (!fileStartIndex.value) return false
+
+    return true
+  }
+
+  return {
+    fileName,
+    fileStartIndex,
+    validateInput,
+  }
+}
+
+const manageGeneration = () => {
+  const { drawImage } = promiseDrawImage()
+
+  const combinations = []
+  const urlList = []
+
+  const downloadImages = (fileName, fileStartIndex) => {
+    urlList.forEach((el, index) => {
+      const aTag = document.createElement('a')
+      aTag.download = `${fileName}_${fileStartIndex + index}.png`
+      aTag.href = el
+      aTag.click()
+    })
+  }
+
+  const imgToDataURL = (canvas) =>
+    new Promise((resolve, reject) => {
+      let dataURL = canvas.toDataURL('image/png')
 
       dataURL = dataURL.replace(/^data:image\/[^;]*/, 'data:application/octet-stream')
 
@@ -29,39 +75,78 @@ export default {
         'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Canvas.png'
       )
 
-      console.log(dataURL)
+      resolve(dataURL)
+    })
 
-      // const aTag = document.createElement('a')
-      // aTag.download = `resized_${name}`
-      // aTag.href = dataURL
-      // aTag.click()
+  const drawCombinations = async (categoryList, canvas) => {
+    for (const combination of combinations) {
+      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+
+      for (let i = 0; i < combination.length; i++) {
+        const { img } = categoryList[i].imgList[combination[i]]
+        await drawImage(canvas, img)
+      }
+      const dataURL = await imgToDataURL(canvas)
+      urlList.push(dataURL)
     }
+  }
 
-    const generateImage = () => {
+  const combineImage = (categoryList, imgList, indexList) => {
+    const depth = indexList.length
+
+    imgList.forEach((img, index) => {
+      const nextIndexList = [...indexList, index]
+      const nextCatIndex = depth + 1
+
+      if (categoryList.length > nextCatIndex) {
+        combineImage(categoryList, categoryList[nextCatIndex].imgList, nextIndexList)
+      } else {
+        combinations.push(nextIndexList)
+      }
+    })
+  }
+
+  return {
+    combineImage,
+    downloadImages,
+    drawCombinations,
+  }
+}
+
+export default {
+  props: {
+    categoryList: Array,
+  },
+  setup(props) {
+    const refCanvas = ref(null)
+
+    const { fileName, fileStartIndex, validateInput } = setFilesName()
+
+    const { combineImage, downloadImages, drawCombinations } = manageGeneration()
+
+    const initCanvas = async () => {
       const baseImg = props.categoryList[0].imgList[0]
 
       refCanvas.value.width = baseImg.img.width
       refCanvas.value.height = baseImg.img.height
+    }
 
-      const lazyDrawImage = async (index) => {
-        const { img } = props.categoryList[index].imgList[0]
-        refCanvas.value.getContext('2d').drawImage(img, 0, 0)
-
-        setTimeout(() => {
-          if (props.categoryList[index + 1]) {
-            lazyDrawImage(index + 1)
-          } else {
-            downloadImage('test')
-          }
-        }, 1000)
+    const generateImages = async () => {
+      if (validateInput()) {
+        combineImage(props.categoryList, props.categoryList[0].imgList, [])
+        await drawCombinations(props.categoryList, refCanvas.value)
+        downloadImages(fileName.value, fileStartIndex.value)
+      } else {
+        alert('Set File Name and Index')
       }
-
-      lazyDrawImage(0)
     }
 
     return {
       refCanvas,
-      generateImage,
+      fileName,
+      fileStartIndex,
+      initCanvas,
+      generateImages,
     }
   },
 }
@@ -69,6 +154,33 @@ export default {
 
 <style lang="scss">
 .generate-section {
+  .form-wrapper {
+    display: flex;
+    align-items: center;
+    margin: 0 0 10px;
+
+    .input-wrapper {
+      display: flex;
+      flex-direction: column;
+
+      span {
+        font-size: 14px;
+      }
+    }
+
+    input {
+      padding: 8px 16px;
+      font-size: 16px;
+      border: 1px solid rgba(44, 62, 80, 0.4);
+      border-radius: 4px;
+      margin: 0 10px 0 0;
+    }
+
+    .app-button {
+      margin: 0 0 0 10px;
+    }
+  }
+
   .generate-canvas {
     .title {
       display: flex;

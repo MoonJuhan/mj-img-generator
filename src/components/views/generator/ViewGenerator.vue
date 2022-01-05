@@ -54,7 +54,7 @@ export default {
     const generateImages = () => {
       progress.value = 3
 
-      nextTick(refGenerateSection.value.generateImage)
+      nextTick(refGenerateSection.value.initCanvas)
     }
 
     return {
