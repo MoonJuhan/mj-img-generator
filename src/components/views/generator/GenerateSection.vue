@@ -20,7 +20,7 @@
     </div>
 
     <div class="generate-canvas">
-      <span class="title">Generate Canvas</span>
+      <span class="title">Generate Canvas (Estimated Time : {{ estimatedTime }}sec)</span>
       <canvas ref="refCanvas" />
     </div>
   </div>
@@ -124,8 +124,14 @@ export default {
 
     const { combineImage, downloadImages, drawCombinations } = manageGeneration()
 
+    const estimatedTime = ref(0)
+
     const initCanvas = async () => {
       const baseImg = props.categoryList[0].imgList[0]
+
+      props.categoryList.forEach((cat) => {
+        estimatedTime.value += props.categoryList.length * cat.imgList.length * 0.25
+      })
 
       refCanvas.value.width = baseImg.img.width
       refCanvas.value.height = baseImg.img.height
@@ -147,6 +153,7 @@ export default {
       fileStartIndex,
       initCanvas,
       generateImages,
+      estimatedTime,
     }
   },
 }
