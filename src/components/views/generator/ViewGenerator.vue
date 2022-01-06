@@ -1,15 +1,14 @@
 <template>
   <div class="view-generator">
-    <div class="button-wrapper glass-wrapper">
-      <AppButton :text="'Add Category'" @on-click="addCategory" :disabled="progress !== 1" />
-      <AppButton :text="'Set Position'" @on-click="setPosition" :disabled="progress !== 1" />
-      <AppButton :text="'Generate Images'" @on-click="generateImages" :disabled="progress !== 2" />
-    </div>
-
     <div class="wrap-div">
       <div class="section-wrapper" :class="`progress-${progress}`">
-        <UploadSection class="section" ref="refUploadSection" :locked="progress !== 1" />
-        <SetPositionSection class="section" ref="refSetPositionSection" :categoryList="refinedCategoryList" />
+        <UploadSection class="section" :locked="progress !== 1" @set-position="setPosition" />
+        <SetPositionSection
+          class="section"
+          ref="refSetPositionSection"
+          :categoryList="refinedCategoryList"
+          @generate-images="generateImages"
+        />
         <GenerateSection class="section" ref="refGenerateSection" :categoryList="refinedCategoryList" />
       </div>
     </div>
@@ -30,25 +29,18 @@ export default {
   },
   setup() {
     const progress = ref(1)
-    const refUploadSection = ref(null)
+
     const refSetPositionSection = ref(null)
     const refGenerateSection = ref(null)
 
-    const addCategory = () => {
-      if (progress.value === 1) {
-        refUploadSection.value.addCategory()
-      }
-    }
-
     const refinedCategoryList = ref([])
 
-    const setPosition = () => {
-      if (refUploadSection.value.refineItems()) {
-        progress.value = 2
-        refinedCategoryList.value = refUploadSection.value.localCategoryList
+    const setPosition = (categoryList) => {
+      progress.value = 2
 
-        nextTick(refSetPositionSection.value.initCanvas)
-      }
+      refinedCategoryList.value = categoryList
+
+      nextTick(refSetPositionSection.value.initCanvas)
     }
 
     const generateImages = () => {
@@ -58,10 +50,8 @@ export default {
     }
 
     return {
-      refUploadSection,
       refSetPositionSection,
       refGenerateSection,
-      addCategory,
       setPosition,
       generateImages,
       progress,

@@ -19,6 +19,10 @@
         />
       </ul>
     </div>
+
+    <div class="button-wrapper">
+      <AppButton :text="'Next Step'" @on-click="$emit('generate-images')" />
+    </div>
   </div>
 </template>
 

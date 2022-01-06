@@ -12,6 +12,10 @@
       :deleteDisabled="index === 0"
       :locked="locked"
     />
+    <li class="button-wrapper">
+      <AppButton :text="'Add Category'" @on-click="addCategory" :disabled="locked" />
+      <AppButton :text="'Next Step'" @on-click="setPosition" :disabled="locked" />
+    </li>
   </ul>
 </template>
 
@@ -26,10 +30,10 @@ export default {
   components: {
     CategoryWrapper,
   },
-  setup() {
+  setup(props, { emit }) {
     const categoryList = ref([
       {
-        name: 'Category 1',
+        name: 'Category 1 (Base Image)',
         imgList: [],
         disabled: false,
       },
@@ -90,6 +94,12 @@ export default {
       }
     }
 
+    const setPosition = () => {
+      if (refineItems()) {
+        emit('setPosition', localCategoryList.value)
+      }
+    }
+
     return {
       categoryList,
       localCategoryList,
@@ -98,6 +108,7 @@ export default {
       deleteImage,
       deleteCategory,
       refineItems,
+      setPosition,
     }
   },
 }
