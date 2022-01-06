@@ -1,5 +1,6 @@
 <template>
   <h1>MJ Img Generator</h1>
+  <AppNav />
   <RouterView />
 </template>
 
@@ -20,7 +21,6 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
 }
 
 ul {
