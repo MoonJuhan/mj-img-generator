@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
 import promiseDrawImage from '@/hooks/promise-draw-image.js'
 import { ref } from 'vue'
 
@@ -56,26 +58,22 @@ const manageGeneration = () => {
   const urlList = []
 
   const downloadImages = (fileName, fileStartIndex) => {
+    const zip = new JSZip()
+
     urlList.forEach((el, index) => {
-      const aTag = document.createElement('a')
-      aTag.download = `${fileName}_${fileStartIndex + index}.png`
-      aTag.href = el
-      aTag.click()
+      zip.file(`${fileName}_${fileStartIndex + index}.png`, el, { base64: true })
+    })
+
+    zip.generateAsync({ type: 'blob' }).then(function (content) {
+      saveAs(content, `${fileName}_results.zip`)
     })
   }
 
   const imgToDataURL = (canvas) =>
     new Promise((resolve, reject) => {
-      let dataURL = canvas.toDataURL('image/png')
+      const dataURL = canvas.toDataURL()
 
-      dataURL = dataURL.replace(/^data:image\/[^;]*/, 'data:application/octet-stream')
-
-      dataURL = dataURL.replace(
-        /^data:application\/octet-stream/,
-        'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Canvas.png'
-      )
-
-      resolve(dataURL)
+      resolve(dataURL.substr(dataURL.indexOf(',') + 1))
     })
 
   const drawCombinations = async (categoryList, canvas) => {
