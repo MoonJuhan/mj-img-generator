@@ -11,7 +11,7 @@
 
     <ul>
       <li v-for="(img, imgIndex) in item.imgList" :key="imgIndex">
-        <img :src="img.img.src" />
+        <img :src="img.img?.src" />
         <span v-if="!locked" class="delete-button" @click="deleteImage(imgIndex)">Delete</span>
       </li>
       <li v-if="!locked">

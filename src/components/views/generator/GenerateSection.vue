@@ -77,14 +77,18 @@ const manageGeneration = () => {
     })
 
   const drawCombinations = async (categoryList, canvas) => {
-    for (const combination of combinations) {
+    const refinedCombinations = refineCombination(combinations)
+
+    for (const combination of refinedCombinations) {
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
 
       for (let i = 0; i < combination.length; i++) {
         const { img } = categoryList[i].imgList[combination[i]]
-        await drawImage(canvas, img)
+
+        if (img) await drawImage(canvas, img)
       }
       const dataURL = await imgToDataURL(canvas)
+
       urlList.push(dataURL)
     }
   }
@@ -104,7 +108,29 @@ const manageGeneration = () => {
     })
   }
 
+  const setEmptyImage = (list) =>
+    list.map((el, index) => {
+      if (index !== 0) el.imgList.splice(0, 0, { img: null })
+
+      return el
+    })
+
+  const refineCombination = (list) => {
+    const randomized = list.sort(() => Math.random() - 0.5)
+
+    const noEmptyList = randomized.filter(
+      (el) =>
+        [...el]
+          .filter((i, index) => index !== 0)
+          .join('')
+          .replaceAll('0', '').length !== 0
+    )
+
+    return noEmptyList
+  }
+
   return {
+    setEmptyImage,
     combineImage,
     downloadImages,
     drawCombinations,
@@ -120,7 +146,7 @@ export default {
 
     const { fileName, fileStartIndex, validateInput } = setFilesName()
 
-    const { combineImage, downloadImages, drawCombinations } = manageGeneration()
+    const { setEmptyImage, combineImage, downloadImages, drawCombinations } = manageGeneration()
 
     const estimatedTime = ref(0)
 
@@ -137,7 +163,8 @@ export default {
 
     const generateImages = async () => {
       if (validateInput()) {
-        combineImage(props.categoryList, props.categoryList[0].imgList, [])
+        const refinedCategoryList = setEmptyImage(props.categoryList)
+        combineImage(refinedCategoryList, props.categoryList[0].imgList, [])
         await drawCombinations(props.categoryList, refCanvas.value)
         downloadImages(fileName.value, fileStartIndex.value)
       } else {
