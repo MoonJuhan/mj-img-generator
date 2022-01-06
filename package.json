@@ -12,6 +12,7 @@
     "core-js": "^3.6.5",
     "file-saver": "^2.0.5",
     "jszip": "^3.7.1",
+    "selenium-webdriver": "^4.1.0",
     "vue": "^3.0.11",
     "vue-router": "^4.0.8",
     "vuex": "^4.0.1"
