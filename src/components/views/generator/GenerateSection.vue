@@ -148,14 +148,18 @@ export default {
 
     const { setEmptyImage, combineImage, downloadImages, drawCombinations } = manageGeneration()
 
-    const estimatedTime = ref(0)
+    const estimatedTime = ref(0.25)
 
     const initCanvas = async () => {
       const baseImg = props.categoryList[0].imgList[0]
 
-      props.categoryList.forEach((cat) => {
-        estimatedTime.value += props.categoryList.length * cat.imgList.length * 0.25
+      props.categoryList.forEach((cat, index) => {
+        const imgLength = (index !== 0 ? 1 : 0) + cat.imgList.length
+        estimatedTime.value = estimatedTime.value * imgLength
       })
+
+      estimatedTime.value = estimatedTime.value * props.categoryList.length
+      estimatedTime.value -= props.categoryList[0].imgList.length * 0.25
 
       refCanvas.value.width = baseImg.img.width
       refCanvas.value.height = baseImg.img.height
