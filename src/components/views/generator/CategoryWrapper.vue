@@ -1,10 +1,17 @@
 <template>
   <li class="category-wrapper">
-    <div class="title-wrapper">
-      <span v-html="item.name" />
+    <span v-html="item.name" />
+
+    <div class="title-wrapper" v-if="!locked">
+      <div class="required-checkbox">
+        <input type="checkbox" v-model="required" :disabled="isBaseImage" />
+        <span @click="onChangeCheckbox">Required</span>
+      </div>
+
       <AppButton
-        v-if="item.imgList.length === 0 && !deleteDisabled && !locked"
-        :text="'Delete Category'"
+        v-if="item.imgList.length === 0 && !isBaseImage"
+        :text="'Delete'"
+        :small="true"
         @on-click="deleteCategory"
       />
     </div>
@@ -23,13 +30,17 @@
 </template>
 
 <script>
+import { onMounted, ref, watch } from 'vue'
+
 export default {
   props: {
     item: Object,
-    deleteDisabled: Boolean,
+    isBaseImage: Boolean,
     locked: Boolean,
   },
   setup(props, { emit }) {
+    const required = ref(false)
+
     const onChangeFile = (e) => {
       emit('on-change-file', {
         files: e,
@@ -50,10 +61,25 @@ export default {
       })
     }
 
+    const onChangeCheckbox = () => {
+      if (!props.isBaseImage) required.value = !required.value
+    }
+
+    watch(
+      () => required.value,
+      () => emit('on-change-required', { item: props.item, required: required.value })
+    )
+
+    onMounted(() => {
+      if (props.isBaseImage) required.value = true
+    })
+
     return {
+      required,
       onChangeFile,
       deleteImage,
       deleteCategory,
+      onChangeCheckbox,
     }
   },
 }
@@ -67,13 +93,19 @@ export default {
     margin: 0 0 10px;
     align-items: center;
 
-    span {
-      padding: 6px 0;
-    }
-
     .app-button {
-      font-size: 16px;
       margin: 0 0 0 10px;
+    }
+  }
+
+  .required-checkbox {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    padding: 4px 0;
+
+    * {
+      cursor: pointer;
     }
   }
 

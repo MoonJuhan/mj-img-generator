@@ -77,7 +77,7 @@ const manageGeneration = () => {
     })
 
   const drawCombinations = async (categoryList, canvas) => {
-    const refinedCombinations = refineCombination(combinations)
+    const refinedCombinations = refineCombination(categoryList, combinations)
 
     for (const combination of refinedCombinations) {
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
@@ -109,24 +109,22 @@ const manageGeneration = () => {
   }
 
   const setEmptyImage = (list) =>
-    list.map((el, index) => {
-      if (index !== 0) el.imgList.splice(0, 0, { img: null })
+    list.map((el) => {
+      if (!el.required) el.imgList.splice(0, 0, { img: null })
 
       return el
     })
 
-  const refineCombination = (list) => {
-    const randomized = list.sort(() => Math.random() - 0.5)
+  const refineCombination = (categoryList, indexList) => {
+    const randomized = indexList.sort(() => Math.random() - 0.5)
 
-    const noEmptyList = randomized.filter(
-      (el) =>
-        [...el]
-          .filter((i, index) => index !== 0)
-          .join('')
-          .replaceAll('0', '').length !== 0
-    )
+    const firstExcept = (list) => [...list].filter((i, index) => index !== 0)
 
-    return noEmptyList
+    const emptiable = firstExcept(categoryList).findIndex((el) => el.required) === -1
+
+    if (emptiable) return randomized.filter((el) => firstExcept(el).join('').replaceAll('0', '').length !== 0)
+
+    return randomized
   }
 
   return {

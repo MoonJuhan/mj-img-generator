@@ -14,7 +14,6 @@
           v-for="(item, index) in categoryList"
           :key="index"
           :item="item"
-          :deleteDisabled="true"
           :locked="true"
         />
       </ul>

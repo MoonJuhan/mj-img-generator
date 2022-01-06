@@ -1,5 +1,5 @@
 <template>
-  <a class="app-button" :class="{ disabled }" @click="onClick" v-html="text" />
+  <a class="app-button" :class="{ disabled, small }" @click="onClick" v-html="text" />
 </template>
 
 <script>
@@ -9,6 +9,7 @@ export default {
     text: String,
     link: String,
     disabled: Boolean,
+    small: Boolean,
   },
   setup(props, { emit }) {
     const router = useRouter()
@@ -45,6 +46,11 @@ export default {
     &:active {
       background-color: rgba(44, 62, 80, 0.1);
     }
+  }
+
+  &.small {
+    font-size: 14px;
+    padding: 4px 8px;
   }
 
   &:hover {

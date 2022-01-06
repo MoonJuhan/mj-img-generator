@@ -9,7 +9,8 @@
       @on-change-file="onChangeFile"
       @delete-image="deleteImage"
       @delete-category="deleteCategory"
-      :deleteDisabled="index === 0"
+      @on-change-required="onChangeRequired"
+      :isBaseImage="index === 0"
       :locked="locked"
     />
     <li class="button-wrapper">
@@ -100,6 +101,10 @@ export default {
       }
     }
 
+    const onChangeRequired = ({ item, required }) => {
+      item.required = required
+    }
+
     return {
       categoryList,
       localCategoryList,
@@ -109,6 +114,7 @@ export default {
       deleteCategory,
       refineItems,
       setPosition,
+      onChangeRequired,
     }
   },
 }
