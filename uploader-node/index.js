@@ -1,8 +1,9 @@
 const http = require('http')
 const express = require('express')
-
+const cors = require('cors')
 const app = express()
 
+app.use(cors())
 const localWebDriver = 'http://localhost:9515'
 const webdriver = require('selenium-webdriver')
 const driver = new webdriver.Builder().usingServer(localWebDriver).forBrowser('chrome').build()

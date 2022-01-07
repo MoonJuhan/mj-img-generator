@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
+    "cors": "^2.8.5",
     "file-saver": "^2.0.5",
     "jszip": "^3.7.1",
     "selenium-webdriver": "^4.1.0",
