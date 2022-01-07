@@ -53,7 +53,7 @@ export default {
     const serverURL = 'http://localhost:8081'
 
     const checkAvailable = async () => {
-      const { status } = await axios.get(`${serverURL}/ready`)
+      const { status } = await axios.get(`${serverURL}/status`)
 
       if (status === 200) {
         alert('Go to Webdriver and Download Metamask Chrome Extention')
@@ -72,7 +72,7 @@ export default {
 
     const uploadStart = async () => {
       if (validate(uploadInfo.value)) {
-        const { data, status } = await axios.post(`${serverURL}/upload`, uploadInfo.value)
+        const { data, status } = await axios.post(`${serverURL}/items`, uploadInfo.value)
 
         console.log(data)
 
