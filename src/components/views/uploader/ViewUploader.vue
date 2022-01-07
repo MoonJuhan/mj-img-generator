@@ -5,31 +5,32 @@
 
       <div class="input-wrapper">
         <span class="title">Name</span>
-        <input type="text" v-model="name" />
+        <input type="text" v-model="uploadInfo.name" />
       </div>
 
       <div class="input-wrapper">
         <span class="title">File Start Index</span>
-        <input type="number" v-model="fileStartIndex" min="0" />
+        <input type="number" v-model="uploadInfo.fileStartIndex" min="0" />
       </div>
 
       <div class="input-wrapper">
         <span class="title">Collection Name</span>
-        <input type="text" v-model="conllectionName" />
+        <input type="text" v-model="uploadInfo.conllectionName" />
       </div>
 
       <div class="input-wrapper">
         <span class="title">Blockchain Name</span>
-        <input type="text" v-model="blockchainName" />
+        <input type="text" v-model="uploadInfo.blockchainName" />
       </div>
 
       <div class="input-wrapper">
         <span class="title">price</span>
-        <input type="number" v-model="price" min="0" />
+        <input type="number" v-model="uploadInfo.price" min="0" />
       </div>
 
       <div class="button-wrapper">
-        <AppButton :text="'Call Node'" @on-click="callNode" />
+        <AppButton :text="'Check Available'" @on-click="checkAvailable" />
+        <AppButton :text="'Upload Start'" @on-click="uploadStart" />
       </div>
     </div>
   </div>
@@ -41,23 +42,53 @@ import { ref } from 'vue'
 
 export default {
   setup() {
-    const name = ref(null)
-    const fileStartIndex = ref(null)
-    const conllectionName = ref(null)
-    const blockchainName = ref(null)
-    const price = ref(null)
+    const uploadInfo = ref({
+      name: null,
+      fileStartIndex: null,
+      conllectionName: null,
+      blockchainName: null,
+      price: null,
+    })
 
-    const callNode = async () => {
-      const data = await axios.get('http://localhost:8081/setup')
-      console.log(data)
+    const serverURL = 'http://localhost:8081'
+
+    const checkAvailable = async () => {
+      const { status } = await axios.get(`${serverURL}/ready`)
+
+      if (status === 200) {
+        alert('Go to Webdriver and Download Metamask Chrome Extention')
+      } else {
+        alert('Server Error')
+      }
+    }
+
+    const validate = (obj) => {
+      for (const [key, value] of Object.entries(obj)) {
+        if (!value) return false
+      }
+
+      return true
+    }
+
+    const uploadStart = async () => {
+      if (validate(uploadInfo.value)) {
+        const { data, status } = await axios.post(`${serverURL}/upload`, uploadInfo.value)
+
+        console.log(data)
+
+        if (status === 200) {
+          alert('Completed')
+        } else {
+          alert('Error')
+        }
+      } else {
+        alert('All Input Required')
+      }
     }
     return {
-      name,
-      fileStartIndex,
-      conllectionName,
-      blockchainName,
-      price,
-      callNode,
+      uploadInfo,
+      uploadStart,
+      checkAvailable,
     }
   },
 }
