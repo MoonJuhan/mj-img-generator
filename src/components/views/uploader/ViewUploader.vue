@@ -50,7 +50,7 @@ export default {
       price: null,
     })
 
-    const serverURL = 'http://localhost:8081'
+    const serverURL = process.env.VUE_APP_NODE_URL
 
     const checkAvailable = async () => {
       const { status } = await axios.get(`${serverURL}/status`)
@@ -72,9 +72,7 @@ export default {
 
     const uploadStart = async () => {
       if (validate(uploadInfo.value)) {
-        const { data, status } = await axios.post(`${serverURL}/items`, uploadInfo.value)
-
-        console.log(data)
+        const { status } = await axios.post(`${serverURL}/items`, uploadInfo.value)
 
         if (status === 200) {
           alert('Completed')
@@ -85,6 +83,7 @@ export default {
         alert('All Input Required')
       }
     }
+
     return {
       uploadInfo,
       uploadStart,
