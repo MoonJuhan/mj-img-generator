@@ -1,4 +1,5 @@
 const localWebDriver = 'http://localhost:9515'
+const { sleep, openURL, clickElementByText } = require('./helpers')
 const webdriver = require('selenium-webdriver')
 const driver = new webdriver.Builder().usingServer(localWebDriver).forBrowser('chrome').build()
 const By = webdriver.By
