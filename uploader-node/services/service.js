@@ -46,6 +46,31 @@ exports.getStatus = async () => {
   }
 }
 
+const createNewItems = async (params) => {
+  const { createNewItem, sellItem } = require('./manage-upload')
+  const fs = require('fs')
+
+  fs.readdir('./images', async (err, files) => {
+    const imageList = files.filter((el) => el !== '.DS_Store')
+
+    console.log(`The number of files to be uploaded: ${imageList.length}`)
+
+    for (let i = 0; i < imageList.length; i++) {
+      const image = imageList[i]
+      await openURL(driver, 'https://opensea.io/asset/create')
+
+      await createNewItem(driver, {
+        image,
+        name: `${params.name}_${params.fileStartIndex + i}`,
+        conllection: params.conllectionName,
+        blockchain: params.blockchainName,
+      })
+
+      await sellItem(driver, params.price)
+    }
+  })
+}
+
 const loginOpensea = async () => {
   await openURL(driver, 'https://opensea.io/login')
   await clickElementByText(driver, 'button', `MetaMaskPopular`)
@@ -65,6 +90,7 @@ const loginOpensea = async () => {
 exports.insertItems = async (params) => {
   try {
     await loginOpensea()
+    await createNewItems(params)
   } catch (err) {
     console.log(err)
     throw Error(err)
