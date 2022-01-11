@@ -8,15 +8,36 @@ const openURL = async (driver, url, sleepTime) => {
   await sleep(sleepTime || 250)
 }
 
-const clickElementByText = async (driver, type, text, sleepTime) => {
+const clickElementByText = async (driver, type, text, emptiable = false, sleepTime = 0, stack = 0) => {
   const elements = await driver.findElements(By.css(type))
 
   for (let i = 0; i < elements.length; i++) {
     const innerText = await elements[i].getText()
-    if (innerText === text) {
+
+    const refinedText = innerText
+      .split('')
+      .filter((char) => char.charCodeAt(0) !== 10)
+      .join('')
+
+    if (refinedText === text) {
       await elements[i].click()
-      await sleep(sleepTime || 0)
-      return
+      await sleep(sleepTime)
+      return true
+    }
+  }
+
+  if (stack < process.env.DELAY_TIME) {
+    if (emptiable && stack > 4) return false
+    
+    console.log(`clickElementByText Func retry to find ${text} in ${stack + 1} times.`)
+    await sleep(250)
+    return await clickElementByText(driver, type, text, emptiable, sleepTime, stack + 1)
+  }
+
+  console.log(`clickElementByText Func fail to find ${text}`)
+  return false
+}
+
 const controllMetamaskWindow = async (driver, callback, stack = 0) => {
   stack++
   const data = await driver.getAllWindowHandles()
