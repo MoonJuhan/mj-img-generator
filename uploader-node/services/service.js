@@ -19,9 +19,27 @@ const setupWebdriver = async () => {
 
 setupWebdriver()
 
+const initTab = async () => {
+  const data = await driver.getAllWindowHandles()
+  const metamaskWindow = []
+
+  for (let i = 0; i < data.length; i++) {
+    await driver.switchTo().window(data[i])
+    const title = await driver.getTitle()
+
+    if (title !== 'MetaMask') {
+      await driver.close()
+    } else {
+      metamaskWindow.push(data[i])
+    }
+  }
+
+  await driver.switchTo().window(metamaskWindow[0])
+}
 
 exports.getStatus = async () => {
   try {
+    await initTab()
   } catch (err) {
     console.log(err)
     throw Error(err)
