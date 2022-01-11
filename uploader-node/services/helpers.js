@@ -3,9 +3,9 @@ const By = webdriver.By
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const openURL = async (driver, url, sleepTime) => {
+const openURL = async (driver, url, sleepTime = 250) => {
   await driver.get(url)
-  await sleep(sleepTime || 250)
+  await sleep(sleepTime)
 }
 
 const clickElementByText = async (driver, type, text, emptiable = false, sleepTime = 0, stack = 0) => {
