@@ -37,9 +37,53 @@ const initTab = async () => {
   await driver.switchTo().window(metamaskWindow[0])
 }
 
+const loginMetamask = async () => {
+  const url = await driver.getCurrentUrl()
+  const refinedURL = url.split('#initialize')[0]
+
+  await openURL(driver, `${refinedURL}#initialize/welcome`)
+
+  await clickElementByText(driver, 'button', '시작하기')
+  await clickElementByText(driver, 'button', '지갑 가져오기')
+  await clickElementByText(driver, 'button', '동의함')
+
+  const inputResetNonce = async (stack = 0) => {
+    stack++
+    const inputElements = await driver.findElements(By.css('input'))
+
+    if (inputElements.length === 3) {
+      const el = inputElements[0]
+
+      await el.sendKeys(
+        'input your reset nonce',
+        webdriver.Key.TAB,
+        webdriver.Key.TAB,
+        'input your new password',
+        webdriver.Key.TAB,
+        'input your new password',
+        webdriver.Key.TAB,
+        webdriver.Key.ENTER,
+        webdriver.Key.TAB,
+        webdriver.Key.TAB,
+        webdriver.Key.ENTER
+      )
+    } else {
+      if (stack < process.env.DELAY_TIME) {
+        await sleep(250)
+        await inputResetNonce(stack)
+      }
+    }
+  }
+
+  await inputResetNonce()
+
+  await clickElementByText(driver, 'button', '모두 완료')
+}
+
 exports.getStatus = async () => {
   try {
     await initTab()
+    await loginMetamask()
   } catch (err) {
     console.log(err)
     throw Error(err)
