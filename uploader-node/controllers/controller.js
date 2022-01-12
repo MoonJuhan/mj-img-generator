@@ -1,4 +1,9 @@
 const service = require('../services/service')
+const path = require('path')
+
+exports.renderFrontend = async (req, res, next) => {
+  res.sendFile(path.join(__dirname, '../../dist', 'index.html'))
+}
 
 exports.getStatus = async (req, res, next) => {
   try {

@@ -6,10 +6,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "node": "node ./uploader-node/index.js"
+    "node": "node ./uploader-node/index.js",
+    "start": "vue-cli-service build && node ./uploader-node/index.js"
   },
   "dependencies": {
     "axios": "^0.24.0",
+    "connect-history-api-fallback": "^1.6.0",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
