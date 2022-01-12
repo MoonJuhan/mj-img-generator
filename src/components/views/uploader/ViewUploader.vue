@@ -53,7 +53,7 @@ export default {
     const serverURL = process.env.VUE_APP_NODE_URL
 
     const checkAvailable = async () => {
-      const { status } = await axios.get(`${serverURL}/status`)
+      const { status } = await axios.get(`${serverURL}/api/status`)
 
       if (status === 200) {
         alert('Go to Webdriver and Download Metamask Chrome Extention')
@@ -72,7 +72,7 @@ export default {
 
     const uploadStart = async () => {
       if (validate(uploadInfo.value)) {
-        const { status } = await axios.post(`${serverURL}/items`, uploadInfo.value)
+        const { status } = await axios.post(`${serverURL}/api/items`, uploadInfo.value)
 
         if (status === 200) {
           alert('Completed')
