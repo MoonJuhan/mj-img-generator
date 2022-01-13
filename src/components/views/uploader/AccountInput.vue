@@ -4,7 +4,7 @@
 
     <div class="input-wrapper">
       <span class="title required">Reset Nonce</span>
-      <input type="text" v-model="metamaskAccount.resetNonce" />
+      <input type="password" v-model="metamaskAccount.resetNonce" />
     </div>
 
     <div class="input-wrapper">
@@ -14,7 +14,7 @@
 
     <div class="input-wrapper">
       <span class="title">Private Key</span>
-      <input type="text" v-model="metamaskAccount.privateKey" />
+      <input type="password" v-model="metamaskAccount.privateKey" />
     </div>
 
     <div class="button-wrapper">
