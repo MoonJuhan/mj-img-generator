@@ -87,7 +87,7 @@ const loginMetamask = async ({ resetNonce, resetPassword, privateKey }) => {
   }
 }
 
-exports.initialize = async () => {
+exports.initialize = async (params) => {
   try {
     await initTab()
     await loginMetamask(params)
