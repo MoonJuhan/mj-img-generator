@@ -5,9 +5,11 @@ exports.renderFrontend = async (req, res, next) => {
   res.sendFile(path.join(__dirname, '../../dist', 'index.html'))
 }
 
-exports.getStatus = async (req, res, next) => {
+exports.initialize = async (req, res, next) => {
   try {
-    await service.getStatus()
+    const params = req.body
+
+    await service.initialize(params)
 
     return res.sendStatus(200)
   } catch (error) {
@@ -16,9 +18,9 @@ exports.getStatus = async (req, res, next) => {
 }
 
 exports.insertItems = async (req, res, next) => {
-  const params = req.body
-
   try {
+    const params = req.body
+
     await service.insertItems(params)
 
     return res.sendStatus(200)

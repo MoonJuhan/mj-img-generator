@@ -37,7 +37,7 @@ const initTab = async () => {
   await driver.switchTo().window(metamaskWindow[0])
 }
 
-const loginMetamask = async () => {
+const loginMetamask = async ({ resetNonce, resetPassword, privateKey }) => {
   const url = await driver.getCurrentUrl()
   const refinedURL = url.split('#initialize')[0]
 
@@ -55,12 +55,12 @@ const loginMetamask = async () => {
       const el = inputElements[0]
 
       await el.sendKeys(
-        'input your reset nonce',
+        resetNonce,
         webdriver.Key.TAB,
         webdriver.Key.TAB,
-        'input your new password',
+        resetPassword,
         webdriver.Key.TAB,
-        'input your new password',
+        resetPassword,
         webdriver.Key.TAB,
         webdriver.Key.ENTER,
         webdriver.Key.TAB,
@@ -78,12 +78,19 @@ const loginMetamask = async () => {
   await inputResetNonce()
 
   await clickElementByText(driver, 'button', '모두 완료')
+
+  if (privateKey) {
+    await openURL(driver, `${refinedURL}#new-account/import`, 500)
+
+    const privateKeyInput = await driver.findElement(By.css('input'))
+    privateKeyInput.sendKeys(privateKey, webdriver.Key.TAB, webdriver.Key.TAB, webdriver.Key.ENTER)
+  }
 }
 
-exports.getStatus = async () => {
+exports.initialize = async () => {
   try {
     await initTab()
-    await loginMetamask()
+    await loginMetamask(params)
   } catch (err) {
     console.log(err)
     throw Error(err)
