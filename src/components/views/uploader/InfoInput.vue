@@ -19,11 +19,13 @@
 
     <div class="input-wrapper">
       <span class="title required">Blockchain Name</span>
-      <input type="text" v-model="uploadInfo.blockchainName" />
+      <select v-model="uploadInfo.blockchainName">
+        <option value="Polygon">Polygon</option>
+      </select>
     </div>
 
     <div class="input-wrapper">
-      <span class="title required">price</span>
+      <span class="title required">Price</span>
       <input type="number" v-model="uploadInfo.price" min="0" />
     </div>
 

@@ -31,7 +31,7 @@ export default {
   setup(props, { emit }) {
     const metamaskAccount = ref({
       resetNonce: null,
-      resetPassword: null,
+      resetPassword: '123123123',
       privateKey: null,
     })
 

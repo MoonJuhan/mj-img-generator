@@ -66,7 +66,7 @@ export default {
       }
     }
 
-    input {
+    input, select {
       padding: 8px 16px;
       font-size: 16px;
       border: 1px solid rgba(44, 62, 80, 0.4);
